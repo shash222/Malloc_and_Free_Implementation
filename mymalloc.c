@@ -26,7 +26,6 @@ void* spaceAvailable(int size){
     int spaceAvailable;
     int spaceNeeded = sizeOfStruct + size;
     if (memAvailable - spaceNeeded < 0){
-        printf("Memavailable is too little: %d %d\n", memAvailable, spaceNeeded);
         return NULL;
     }
     if (firstCall == 1) return mem;
@@ -70,9 +69,17 @@ void* mymalloc(int size, char* file, int line){
     }
     else{
         temp = prev -> next;
-        prev -> next = (struct node*) (((char*) ptr) + prev -> dataSize);
+        prev -> next = (struct node*) (((char*) (prev + 1)) + prev -> dataSize);
         ptr = prev -> next;
         ptr -> next = temp;
+
+/*
+        temp = prev -> next;
+        prev -> next = (struct node*) (((char*) ptr) + prev -> dataSize);
+        ptr = prev -> next;
+        printf("%p %p %p %p", prev, prev -> next, ptr, ptr -> next);
+        ptr -> next = temp;
+*/
     }
     ptr -> dataSize = size;
     // returning ++ptr because ptr is address at beginning of metadata, but ++ptr is address at beginning of user data (after metadata)

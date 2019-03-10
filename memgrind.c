@@ -38,18 +38,20 @@ void random1Byte(){
     int mallocCounter = 0;
     char* pointersArr[50];
     int arrIndex = 0;
+    char* ptr;
     while (mallocCounter < 50){
         //even represents malloc
-        int random = rand();
-        if (random % 2 == 0){
+        int random = (rand() % 2);
+        if (random == 0){
             mallocCounter++;
-            pointersArr[arrIndex++] = (char*) malloc(1);
+            ptr = (char*) malloc(1);
+            pointersArr[arrIndex++] = ptr;
         }
         //odd represents free
-        else if (arrIndex > 0) free(pointersArr[arrIndex--]);
+        else if (arrIndex > 0) free(pointersArr[--arrIndex]);
     }
-    printArr(pointersArr);
-    while (arrIndex >= 0) free(pointersArr[arrIndex--]);
+    printf("\n\n\n\n\n\n");
+    while (arrIndex > 0) free(pointersArr[--arrIndex]);
 }
 
 void randomRandomByte(){
@@ -58,13 +60,13 @@ void randomRandomByte(){
     int arrIndex = 0;
     int randNum;
     while (mallocCounter < 50){
-        if (6 % 2 == 0){
+        if (rand() % 2 == 0){
             mallocCounter++;
-            randNum = (127 % 64) + 0;
+            randNum = (rand() % 64) + 0;
             pointersArr[arrIndex++] = (char*) malloc(randNum);
         }
         //odd represents free
-        else free(pointersArr[arrIndex--]);
+        else free(pointersArr[--arrIndex]);
     }
 }
 
@@ -82,8 +84,20 @@ void workload0(){
     for (i = 0; i < 200; i += 2) free(arr[i]);
 }
 
+//Mallocs beyond capacity
+//mallocs below capacity twice
+//Prints addresses off two pointers
+//frees first pointer
+//mallocs twice below capacity of ptr1 to show that ptr2 and ptr3 malloc using "first fit" algorithm as desired on assignment page
 void workload2(){
-    
+    malloc(4096);
+    char* ptr1 = (char*) malloc(1024);
+    char* ptr2 = (char*) malloc(1024);
+    printf("%p %p\n", ptr1, ptr2);
+    free(ptr1);
+    char* ptr3 = (char*) malloc(300);
+    char* ptr4 = (char*) malloc(300);
+    printf("%p %p %p\n", ptr1, ptr3, ptr4);
 }
 
 void issue1(){
@@ -108,8 +122,8 @@ int main(){
 //    random1Byte();
 
 //    randomRandomByte();
-    workload0();
-//    workload2();
+//    workload0();
+    workload2();
 //    issue2();
 //    test1();
    // int i;
