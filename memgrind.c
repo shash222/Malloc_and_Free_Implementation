@@ -77,8 +77,14 @@ void issue1(){
     malloc(8);
 }
 
+void printPtrData(struct node** arr){
+    for (int i = 0; i < 17; i++){
+        printf("%p %d %p\n", arr[i] - 1, (arr[i] - 1) -> dataSize, (arr[i] - 1) -> next);
+    }
+}
+
 void issue2(){
-    malloc(4000);
+    struct node* ptr = malloc(4000);
     //4008 should be used
     //408FC8
     malloc(8);
@@ -90,12 +96,7 @@ void issue2(){
     malloc(1);
     //4042 should be used
     //408FEA
-}
-
-void printPtrData(struct node** arr){
-    for (int i = 0; i < 17; i++){
-        printf("%p %d %p\n", arr[i] - 1, (arr[i] - 1) -> dataSize, (arr[i] - 1) -> next);
-    }
+    malloc(38);
 }
 
 void test1(){
@@ -132,5 +133,5 @@ int main(){
 //    workload2();
     issue2();
 //    test1();
-    // int i;
+   // int i;
 };

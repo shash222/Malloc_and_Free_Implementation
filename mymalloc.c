@@ -15,7 +15,10 @@ static char* lastAddress = &mem[4096] - sizeof(struct node);
 
 
 // Returns pointer to metadata right before sufficient free space
-struct node* getPrevPtr(struct node* ptr){
+struct node* getPrevPtr(struct node* targetPtr){
+    if (head + 1 == targetPtr) return head;
+    struct node* ptr = head;
+    if (((ptr -> next) + 1) == targetPtr) return ptr;
 }
 
 //Pointers point to address of next metadata, not next free address
@@ -36,9 +39,10 @@ void* spaceAvailable(int size){
     
     //No metadata will fit after address stored in lastAddress variable
     while(ptr <= (struct node*) lastAddress && ptr != NULL){
-        dataEndPtr = ( ( (char*) (ptr + 1) ) + (ptr -> dataSize));
-        spaceAvailable = (ptr -> next) - (struct node*) dataEndPtr;
-        if (spaceAvailable >= spaceNeeded) return getPrevPtr(ptr);
+        dataEndPtr = (((char*) (ptr + 1)) + (ptr -> dataSize));
+        spaceAvailable = (char*) (ptr -> next) - dataEndPtr;
+//        printf("%p %p %d %p %d %d\n", ptr -> next, (ptr +1), ptr -> dataSize, dataEndPtr, spaceAvailable, spaceNeeded);
+        if (spaceAvailable >= spaceNeeded) return ptr;
         ptr = ptr -> next;
     }
     return NULL;
@@ -47,7 +51,6 @@ void* spaceAvailable(int size){
 void* mymalloc(int size, char* file, int line){
     //prev refers to address of metadata that's going to point to the pointer being created
     struct node* prev = (struct node*) spaceAvailable(size);
-//    printf("%p\n", prev);
     if (prev == NULL){
         printf("Not enough memory available!\n");
         return NULL;
@@ -57,6 +60,7 @@ void* mymalloc(int size, char* file, int line){
     //Below if statement is the only exception to what prev represents
     if (prev == head + 1){
         head -> dataSize = size;
+        printf("%p\n", head + 1);
         return head + 1;
     }
     memAvailable -= (size + sizeOfStruct);
@@ -77,6 +81,7 @@ void* mymalloc(int size, char* file, int line){
 
     // returning ++ptr because ptr is address at beginning of metadata, but ++ptr is address at beginning of user data (after metadata)
     struct node* usrData = ++ptr;
+    printf("%p\n", usrData);
     return usrData;
 }
 
