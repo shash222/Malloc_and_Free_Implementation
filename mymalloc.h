@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <ctype.h>
+#include <time.h>
+
 #define malloc(param) mymalloc(param, __FILE__, __LINE__)
 #define free(param) myfree(param, __FILE__, __LINE__)
 

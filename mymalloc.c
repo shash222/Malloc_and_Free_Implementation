@@ -4,7 +4,6 @@ struct node{
     short dataSize;//number of blocks being referred to
     struct node* next;
 };
-static int i = 0;
 static int firstCall = 1;
 static struct node* head = (struct node*) mem;
 static int memAvailable = 4096;
@@ -19,21 +18,21 @@ struct node* getPrevPtr(struct node* targetPtr){
     if (head + 1 == targetPtr) return head;
     struct node* ptr = head;
     if (((ptr -> next) + 1) == targetPtr) return ptr;
+    return NULL;
 }
 
 //Pointers point to address of next metadata, not next free address
 void* spaceAvailable(int size){
-    printf("%d\n", size);
     int spaceAvailable;
     int spaceNeeded = sizeOfStruct + size;
     if (memAvailable - spaceNeeded < 0){
+        printf("Memavailable is too little: %d %d\n", memAvailable, spaceNeeded);
         return NULL;
     }
     if (firstCall == 1) return mem;
     if (head -> dataSize == 0) return (head + 1);
     struct node* ptr = head;
     char* dataEndPtr;
-    struct node* next = ptr -> next;
     //spaceNeeded refers to space needed to reserve
     spaceNeeded = size + sizeOfStruct;
     
@@ -41,7 +40,6 @@ void* spaceAvailable(int size){
     while(ptr <= (struct node*) lastAddress && ptr != NULL){
         dataEndPtr = (((char*) (ptr + 1)) + (ptr -> dataSize));
         spaceAvailable = (char*) (ptr -> next) - dataEndPtr;
-//        printf("%p %p %d %p %d %d\n", ptr -> next, (ptr +1), ptr -> dataSize, dataEndPtr, spaceAvailable, spaceNeeded);
         if (spaceAvailable >= spaceNeeded) return ptr;
         ptr = ptr -> next;
     }
@@ -55,15 +53,14 @@ void* mymalloc(int size, char* file, int line){
         printf("Not enough memory available!\n");
         return NULL;
     }
+    memAvailable -= (size + sizeOfStruct);
 
     //If head pointer has been freed, metadata still remains but dataSize for head pointer is 0
     //Below if statement is the only exception to what prev represents
     if (prev == head + 1){
         head -> dataSize = size;
-        printf("%p\n", head + 1);
         return head + 1;
     }
-    memAvailable -= (size + sizeOfStruct);
     struct node* ptr;
     struct node* temp;
     if (firstCall == 1){
@@ -78,10 +75,8 @@ void* mymalloc(int size, char* file, int line){
         ptr -> next = temp;
     }
     ptr -> dataSize = size;
-
     // returning ++ptr because ptr is address at beginning of metadata, but ++ptr is address at beginning of user data (after metadata)
     struct node* usrData = ++ptr;
-    printf("%p\n", usrData);
     return usrData;
 }
 
@@ -114,7 +109,11 @@ void myfree(char* ptr, char* file, int line){
     //metadata pointer;
     struct node* mdPtr = findMD(ptr);
     if (mdPtr == NULL){ 
-        printf("Cannot free pointer, pointer does not exist!");
+        printf("Cannot free pointer, pointer does not exist!\n");
+        return;
+    }
+    if (mdPtr == head && mdPtr -> dataSize == 0){
+        printf("Cannot free pointer, pointer does not exist!\n");
         return;
     }
     printf("Freed ptr at %p\n", ptr);
@@ -126,58 +125,3 @@ void myfree(char* ptr, char* file, int line){
     memAvailable += mdPtr -> next -> dataSize;;
     mdPtr -> next = mdPtr -> next -> next;
 }
-
-
-
-
-/*
-//int value of 0 denotes last item for stored value
-
-void reserveMemory(char* ptr, size_t size){
-    int i;
-//    for (i = 0; i < size; i++) ptr[i] = size - i;
-    //i < size - 1 because if size is 4, only 3 will be marked with 'b', and last will be marked with 'l'
-    for (i = 0; i < size - 1; i++) ptr[i] = 'b';
-    ptr[i] = 'l'
-}
-
-void printReserved(){
-    int i;
-    for (i = 0; i < 4096; i++){
-        printf("%d: %d |", i, mem[i]);
-    }
-    printf("\n");
-}
-
-void* mymalloc(size_t size){
-//    printf("Address from mymalloc: %p\n", &mem);
-    int i;
-    int max = 0;
-    int consecutiveFree = 0;
-     for (i = 0; i < 4096; i++){
-        consecutiveFree = (mem[i] == 0) ? (consecutiveFree + 1) : 0;
-        if (consecutiveFree > max) max = consecutiveFree;
-        if (consecutiveFree == size){
-            reserveMemory(&mem[i - consecutiveFree + 1], size);
-//            printReserved();
-//            printf("Allocated %d bytes\nMemory remaining %d\n", size, 4096 - size);
-            return &mem[i - consecutiveFree + 1];
-        }
-    }
-    printf("Cannot allocate enough memory. \nMax size available: %d\nAmount Needed: %d\n", max, size);
-    return NULL;
-}
-
-void myfree(char* ptr){
-    if (*ptr == 0){
-        printf("Pointer points to null\n");
-        return;
-    }
-    int i = 0;
-    while (ptr[i] != 'b'){
-        ptr[i] = 0;
-        i++;
-    }
-    ptr[i] = 0;
-//    printf("Memory was freed successfully\n");
-}*/

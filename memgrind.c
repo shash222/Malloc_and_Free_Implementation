@@ -1,16 +1,16 @@
 #include "mymalloc.c"
 //Memgrind class
 
-void malloc050Times(){
+void malloc150Times(){
     int i;
-    for (i = 0; i < 050; i++){
-        char* ptr = (char*) malloc(0);
-        printf("%p\n", ptr);
+    for (i = 0; i < 150; i++){
+        char* ptr = (char*) malloc(1);
+        printf("%d.   ",i);
         free(ptr);
     }
 }
 
-void malloc050TimesStorePointersArray(){
+void malloc50TimesStorePointersArray(){
     int i;
     int j;
     char* arr[50];
@@ -26,19 +26,29 @@ void malloc050TimesStorePointersArray(){
     }
 }
 
-void random0Byte(){
+//Temp method to test
+void printArr(char** arr){
+    char* ptr = *arr;
+    int i;
+    for (i = 0; i < 50; i++){}
+    printf("%p\n", ptr + i);
+}
+
+void random1Byte(){
     int mallocCounter = 0;
     char* pointersArr[50];
     int arrIndex = 0;
     while (mallocCounter < 50){
         //even represents malloc
-        if (rand() % 2 == 0){
+        int random = rand();
+        if (random % 2 == 0){
             mallocCounter++;
-            pointersArr[arrIndex++] = (char*) malloc(0);
+            pointersArr[arrIndex++] = (char*) malloc(1);
         }
         //odd represents free
         else if (arrIndex > 0) free(pointersArr[arrIndex--]);
     }
+    printArr(pointersArr);
     while (arrIndex >= 0) free(pointersArr[arrIndex--]);
 }
 
@@ -48,9 +58,9 @@ void randomRandomByte(){
     int arrIndex = 0;
     int randNum;
     while (mallocCounter < 50){
-        if (rand() % 2 == 0){
+        if (6 % 2 == 0){
             mallocCounter++;
-            randNum = (rand() % 64) + 0;
+            randNum = (127 % 64) + 0;
             pointersArr[arrIndex++] = (char*) malloc(randNum);
         }
         //odd represents free
@@ -58,8 +68,18 @@ void randomRandomByte(){
     }
 }
 
+//mallocs 8 bytes every time up to beyond mem array capacity
+//frees all pointers stored at odd indices in array
+//tries to free all pointers stored at odd indices in array, but should print error as they no longer point to reserved space
+//frees all pointers stored at even indices in array
 void workload0(){
-
+    char* arr[200];
+    int i;
+    // adding 8 below to account for all user data reservation, which is always 8
+    for (i = 0; i < 200; i++) arr[i] = (char*) malloc(8);
+    for (i = 1; i < 200; i += 2) free(arr[i]);
+    for (i = 1; i < 200; i += 2) free(arr[i]);
+    for (i = 0; i < 200; i += 2) free(arr[i]);
 }
 
 void workload2(){
@@ -72,68 +92,25 @@ void issue1(){
     for (i = 0; i < n; i++){
         malloc(8);
     }
-    printf("Past Loop: ");
     malloc(8);
     malloc(8);
 }
 
-void printPtrData(struct node** arr){
-    int i;
-    for (i = 0; i < 17; i++){
-        printf("%p %d %p\n", arr[i] - 1, (arr[i] - 1) -> dataSize, (arr[i] - 1) -> next);
-    }
-}
-
-void issue2(){
-    struct node* ptr = malloc(4000);
-    //4008 should be used
-    //408FC8
-    malloc(8);
-    //4024 should be used
-    //408FD8
-    malloc(1);
-    //4033 should be used
-    //408FE1
-    malloc(1);
-    //4042 should be used
-    //408FEA
-    malloc(1);
-    malloc(50);
-}
-
-void test1(){
-    struct node* arr[50];
-    arr[0] = malloc(8);
-    arr[1] = malloc(8);
-    arr[2] = malloc(8);
-    arr[3] = malloc(8);
-    arr[4] = malloc(8);
-    arr[5] = malloc(8);
-    arr[6] = malloc(8);
-    arr[7] = malloc(8);
-    arr[8] = malloc(8);
-    arr[9] = malloc(8);
-    arr[10] = malloc(8);
-    arr[11] = malloc(8);
-    arr[12] = malloc(8);
-    arr[13] = malloc(8);
-    arr[14] = malloc(8);
-    arr[15] = malloc(8);
-    arr[16] = malloc(8);
-//    printPtrData(arr);
-}
 
 int main(){
-//    int arr[6];
-//    struct timeval start;
-//    gettimeofday(&start, NULL);
-//    malloc050Times();
-//    malloc050TimesStorePointersArray();
-//    random0Byte();
+    srand(time(NULL));
+//    malloc150Times();
+
+    //What exactly do we have to do for this method
+//    malloc150TimesStorePointersArray();
+
+    //for some reason, random generator causes code to hang and break?
+//    random1Byte();
+
 //    randomRandomByte();
-//    workload1();
+    workload0();
 //    workload2();
-    issue2();
+//    issue2();
 //    test1();
    // int i;
 };
