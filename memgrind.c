@@ -78,7 +78,8 @@ void issue1(){
 }
 
 void printPtrData(struct node** arr){
-    for (int i = 0; i < 17; i++){
+    int i;
+    for (i = 0; i < 17; i++){
         printf("%p %d %p\n", arr[i] - 1, (arr[i] - 1) -> dataSize, (arr[i] - 1) -> next);
     }
 }
@@ -96,7 +97,8 @@ void issue2(){
     malloc(1);
     //4042 should be used
     //408FEA
-    malloc(38);
+    malloc(1);
+    malloc(50);
 }
 
 void test1(){

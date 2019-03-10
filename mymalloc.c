@@ -11,7 +11,7 @@ static int memAvailable = 4096;
 static int sizeOfStruct = sizeof(struct node);
 // lastAddress points to the last address that can be reserved (with a data size of 0)
 // Accounts for only enough space for meta data to fit
-static char* lastAddress = &mem[4096] - sizeof(struct node);
+static char* lastAddress = &mem[4096];// - sizeof(struct node);
 
 
 // Returns pointer to metadata right before sufficient free space
